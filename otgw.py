@@ -195,8 +195,8 @@ class OTGW:
             self.lastCommand = self.commandQueue.pop()
             return self.lastCommand
 
-        if self.lastCommand and self.lastCommand.sent and time.time() - self.lastCommand.sent > 1 :
-            log.warning("No response in 1 sec for command: {}. Repeating.".format(self.lastCommand.command))
+        if self.lastCommand and self.lastCommand.sent and time.time() - self.lastCommand.sent > 2 :
+            log.warning("No response in 2 sec for command: {}. Repeating.".format(self.lastCommand.command))
             self.lastCommand.sent = False
             return self.lastCommand
 
