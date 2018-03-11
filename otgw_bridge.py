@@ -6,6 +6,7 @@ from threading import Thread
 from otgw_bridge_config import config
 from oled_controller import OledController
 import paho.mqtt.client as mqtt
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -76,7 +77,6 @@ class OTGWBridge:
         if command_generator:
             # Get the command and send it to the OTGW
             command = command_generator(msg.payload)
-            log.info("Queueing command: '{}'".format(command))
             self.__otgw.sendCommand(command)
 
     __true_values = ('True', 'true', '1', 'y', 'yes')
@@ -141,7 +141,7 @@ class OTGWBridge:
                             if not operation.processed:
                                 log.info("Sending command: '{}'".format(operation.command))
                                 self.__otgwClient.write(operation.command)
-                                operation.sent = True
+                                operation.sent = time.time()
                             else:
                                 log.info("Processed command: {}".format(operation))
                     except Exception as e:

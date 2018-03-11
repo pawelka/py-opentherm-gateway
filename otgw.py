@@ -1,6 +1,7 @@
 import logging
 import re
 from collections import deque
+import time
 
 log = logging.getLogger(__name__)
 
@@ -137,9 +138,6 @@ class OTGW:
             self.command = commandLine.rstrip()
             self.commandWord = commandLine.split("=")[0]
         def processLine(self, msgLine):
-            if not self.sent and msgLine.rstrip() == self.commandLine:
-                self.sent = True
-                return True
             if self.sent and msgLine.startswith(self.commandWord+":"):
                 self.result = msgLine.rstrip()
                 self.success = True
@@ -161,12 +159,14 @@ class OTGW:
     lastCommand = None
 
     def sendCommand(self, command):
+        log.info("Queueing command: '{}'".format(command))
         self.commandQueue.append(self.Command(command))
 
     lastMessage = Message()
     seCount = 0
 
     def processLine(self, line):
+
         #process message
         processed = self.lastMessage.processLine(line)
         if self.lastMessage.ready: #message ready
@@ -193,7 +193,11 @@ class OTGW:
 
         if (not self.lastCommand) and self.commandQueue.__len__() > 0:
             self.lastCommand = self.commandQueue.pop()
-            log.debug("Sending command: {}".format(self.lastCommand.command))
+            return self.lastCommand
+
+        if self.lastCommand and self.lastCommand.sent and time.time() - self.lastCommand.sent > 1 :
+            log.warning("No response in 1 sec for command: {}. Repeating.".format(self.lastCommand.command))
+            self.lastCommand.sent = False
             return self.lastCommand
 
         if not processed and len(line.rstrip()) > 0:
