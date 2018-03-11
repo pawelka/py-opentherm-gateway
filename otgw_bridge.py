@@ -151,6 +151,3 @@ class OTGWBridge:
 
         self._worker_thread = None
 
-
-
-OTGWBridge(config).run()
