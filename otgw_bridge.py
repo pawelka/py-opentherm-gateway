@@ -76,7 +76,7 @@ class OTGWBridge:
         if command_generator:
             # Get the command and send it to the OTGW
             command = command_generator(msg.payload)
-            log.info("Sending command: '{}'".format(command))
+            log.info("Queueing command: '{}'".format(command))
             self.__otgw.sendCommand(command)
 
     __true_values = ('True', 'true', '1', 'y', 'yes')
@@ -139,6 +139,7 @@ class OTGWBridge:
                             self.__oled.on_otgw_message(msg=operation)
                         elif isinstance(operation, OTGW.Command):
                             if not operation.processed:
+                                log.info("Sending command: '{}'".format(operation.command))
                                 self.__otgwClient.write(operation.command)
                                 operation.sent = True
                             else:
