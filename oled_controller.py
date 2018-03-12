@@ -38,7 +38,8 @@ class OledController:
                 if msg.boilerSrc:
                     self.__dhw.append((4, "WW: {}".format(msg.boilerSrc.value)))
             if msg.msg == "control_setpoint":
-                pass
+                if msg.boilerSrc:
+                    self.__dhw.append((6, "{}".format(msg.boilerSrc.value)))
 
     def __build_url(self, command):
         return "http://{}/control?cmd={}".format(self.__host, command)
@@ -49,15 +50,19 @@ class OledController:
         id = 0
         r = requests.get(self.__build_url("oledcmd,clear"))
         r.status_code
+        line6 = "       "
         while True:
             try:
                 while len(self.__dhw) > 0:
                     msg = self.__dhw.pop()
                     if (not msg[0] in self.lastRows) or self.lastRows[msg[0]] != msg[1]:
-                        self.lastRows[msg[0]] = msg[1]
-                        r = requests.get(self.__build_url("oled,{},1,{}".format(msg[0], msg[1])))
-                        r.status_code
-                r = requests.get(self.__build_url("oled,6,1,       {}".format(self.loader[id])))
+                        if msg[0] != 6:
+                            self.lastRows[msg[0]] = msg[1]
+                            r = requests.get(self.__build_url("oled,{},1,{}".format(msg[0], msg[1])))
+                            r.status_code
+                        else:
+                            line6 = "{}   ".format(msg[1])
+                r = requests.get(self.__build_url("oled,6,1,{}{}".format(line6, self.loader[id])))
                 id = (id + 1) % 4
                 r.status_code
                 time.sleep(1)

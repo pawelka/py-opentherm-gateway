@@ -67,6 +67,7 @@ class OTGWBridge:
         command_generators = {
             "set/otgw/room_setpoint/temporary": lambda _: "TT={:.2f}".format(float(_)),
             "set/otgw/room_setpoint/constant": lambda _: "TC={:.2f}".format(float(_)),
+            "set/otgw/control_setpoint/temperature": lambda _: "CS={:.2f}".format(float(_)),
             "set/otgw/outside_temperature": lambda _: "OT={:.2f}".format(float(_)),
             "set/otgw/hot_water/enable": lambda _: "HW={}".format('1' if _ in self.__true_values else '0'),
             "set/otgw/hot_water/temperature": lambda _: "SW={:.2f}".format(float(_)),
@@ -87,9 +88,9 @@ class OTGWBridge:
             print(msg)
             if msg.msg in self.__lastThermostatValues and msg.thermostatSrc.value != self.__lastThermostatValues[msg.msg]:
                 if msg.msg == "dhw_setpoint":
-                    command = "SW={:.2f}".format(float(msg.thermostatSrc.value))
+                    command = "SW=0"
                 if msg.msg == "control_setpoint":
-                    command = "TT={:.2f}".format(float(msg.thermostatSrc.value))
+                    command = "CS=0"
                 self.__otgw.send_command(command)
             self.__lastThermostatValues[msg.msg] = msg.thermostatSrc.value
 
