@@ -2,6 +2,7 @@ config = {
     "otgw" : {
         "host": "192.168.2.202",
         "port": "23",
+        "thermostatFirst": True
     },
     "mqtt" : {
         "host": "192.168.2.20",

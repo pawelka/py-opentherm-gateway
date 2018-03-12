@@ -158,7 +158,7 @@ class OTGW:
     commandQueue = deque([])
     lastCommand = None
 
-    def sendCommand(self, command):
+    def send_command(self, command):
         log.info("Queueing command: '{}'".format(command))
         self.commandQueue.append(self.Command(command))
 

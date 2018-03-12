@@ -77,11 +77,25 @@ class OTGWBridge:
         if command_generator:
             # Get the command and send it to the OTGW
             command = command_generator(msg.payload)
-            self.__otgw.sendCommand(command)
+            self.__otgw.send_command(command)
 
     __true_values = ('True', 'true', '1', 'y', 'yes')
+    __lastThermostatValues = {}
+
+    def __thermostat_first(self, msg):
+        if msg.msg in ["dhw_setpoint", "control_setpoint"]:
+            print(msg)
+            if msg.msg in self.__lastThermostatValues and msg.thermostatSrc.value != self.__lastThermostatValues[msg.msg]:
+                if msg.msg == "dhw_setpoint":
+                    command = "SW={:.2f}".format(float(msg.thermostatSrc.value))
+                if msg.msg == "control_setpoint":
+                    command = "TT={:.2f}".format(float(msg.thermostatSrc.value))
+                self.__otgw.send_command(command)
+            self.__lastThermostatValues[msg.msg] = msg.thermostatSrc.value
 
     def __on_otgw_message(self, message):
+        if config["otgw"]["thermostatFirst"]:
+            self.__thermostat_first(message)
         for msg in self.__otgw_translate_message(message):
             log.debug("Sending message to topic {} value {}".format(msg[1], msg[2]))
             self.__mqttc.publish(
