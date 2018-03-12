@@ -85,7 +85,6 @@ class OTGWBridge:
 
     def __thermostat_first(self, msg):
         if msg.msg in ["dhw_setpoint", "control_setpoint"]:
-            print(msg)
             if msg.msg in self.__lastThermostatValues and msg.thermostatSrc.value != self.__lastThermostatValues[msg.msg]:
                 if msg.msg == "dhw_setpoint":
                     command = "SW=0"
@@ -97,6 +96,8 @@ class OTGWBridge:
     def __on_otgw_message(self, message):
         if config["otgw"]["thermostatFirst"]:
             self.__thermostat_first(message)
+        # if message.msg:
+        #     print(message)
         for msg in self.__otgw_translate_message(message):
             log.debug("Sending message to topic {} value {}".format(msg[1], msg[2]))
             self.__mqttc.publish(
@@ -104,7 +105,6 @@ class OTGWBridge:
                 payload=msg[2],
                 qos=config['mqtt']['qos'],
                 retain=config['mqtt']['retain'])
-            # print(message)
 
     def __otgw_translate_message(self, message):
         def extractBit(value, number):
