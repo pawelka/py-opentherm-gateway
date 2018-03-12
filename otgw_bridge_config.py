@@ -12,5 +12,8 @@ config = {
         "set_topic_namespace": "set/otgw",
         "qos": 0,
         "retain": False
+    },
+    "oled" : {
+        "host": "192.168.2.202"
     }
 }

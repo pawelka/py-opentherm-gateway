@@ -19,7 +19,7 @@ class OTGWBridge:
         self.__otgw = OTGW()
         self.__otgw_worker_thread = None
         self.__config = config
-        self.__oled = OledController()
+        self.__oled = OledController(config['oled']['host'])
 
     def run(self):
         if self.__otgw_worker_thread:
